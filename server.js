@@ -41,9 +41,9 @@ app.post('/api/shorturl', (req, res) => {
     );
   }
 
-  // const modified_url = _url.replace(/^https?:\/\//, '');
+  const modified_url = _url.replace(/^https?:\/\//, '');
 
-  DNS.lookup(_url, (err) => {
+  DNS.lookup(modified_url, (err) => {
     if (err) {
       return res.json(
         {
@@ -95,7 +95,7 @@ app.get('/api/shorturl/:id', (req, res) => {
   const short_link = URL.find(sl => sl.short_url === _id);
 
   if (short_link) {
-    return res.redirect(short_link.original_url);
+    return res.redirect('https://' + short_link.original_url);
   }
   else {
     return res.json(
