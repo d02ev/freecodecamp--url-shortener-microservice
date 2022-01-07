@@ -55,45 +55,36 @@ app.post('/api/shorturl', (req, res) => {
   }
 
   DNS.lookup(parsed_url.hostname, (err) => {
-    if (err) {
+    const link_exists = URLs.find(l => l.original_url === _url)
+
+    if (link_exists) {
       return res.json(
         {
-          "error": "invalid url"
+          "original_url": _url,
+          "short_url": id
         }
       );
     }
     else {
-      const link_exists = URLs.find(l => l.original_url === _url)
+      // increment for each new valid url
+      ++id;
 
-      if (link_exists) {
-        return res.json(
-          {
-            "original_url": _url,
-            "short_url": id
-          }
-        );
-      }
-      else {
-        // increment for each new valid url
-        ++id;
+      // object creation for entry into url
+      const url_object = {
+        "original_url": _url,
+        "short_url": `${id}`
+      };
 
-        // object creation for entry into url
-        const url_object = {
+      // pushing each new entry into the array
+      URLs.push(url_object);
+
+      // return the new entry created
+      return res.json(
+        {
           "original_url": _url,
-          "short_url": `${id}`
-        };
-
-        // pushing each new entry into the array
-        URLs.push(url_object);
-
-        // return the new entry created
-        return res.json(
-          {
-            "original_url": _url,
-            "short_url": id
-          }
-        );
-      }
+          "short_url": id
+        }
+      );
     }
   });
 });
