@@ -33,6 +33,14 @@ let id = 0;
 app.post('/api/shorturl', (req, res) => {
   const { url: _url } = req.body;
 
+  if(_url === "") {
+    return res.json(
+      {
+        "error": "invalid url"
+      }
+    );
+  }
+
   const modified_url = _url.replace(/^https?:\/\//, '');
 
   DNS.lookup(modified_url, (err) => {
