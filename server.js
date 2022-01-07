@@ -40,7 +40,7 @@ app.post('/api/shorturl', (req, res) => {
       }
     );
   }
-
+  
   let parsed_url;
 
   try {
@@ -55,36 +55,45 @@ app.post('/api/shorturl', (req, res) => {
   }
 
   DNS.lookup(parsed_url.hostname, (err) => {
-    const link_exists = URLs.find(l => l.original_url === _url)
-
-    if (link_exists) {
+    if (err) {
       return res.json(
         {
-          "original_url": _url,
-          "short_url": id
+          "error": "invalid url"
         }
       );
     }
     else {
-      // increment for each new valid url
-      ++id;
+      const link_exists = URLs.find(l => l.original_url === _url)
 
-      // object creation for entry into url
-      const url_object = {
-        "original_url": _url,
-        "short_url": `${id}`
-      };
+      if (link_exists) {
+        return res.json(
+          {
+            "original_url": _url,
+            "short_url": id
+          }
+        );
+      }
+      else {
+        // increment for each new valid url
+        ++id;
 
-      // pushing each new entry into the array
-      URLs.push(url_object);
-
-      // return the new entry created
-      return res.json(
-        {
+        // object creation for entry into url
+        const url_object = {
           "original_url": _url,
-          "short_url": id
-        }
-      );
+          "short_url": `${id}`
+        };
+
+        // pushing each new entry into the array
+        URLs.push(url_object);
+
+        // return the new entry created
+        return res.json(
+          {
+            "original_url": _url,
+            "short_url": id
+          }
+        );
+      }
     }
   });
 });
