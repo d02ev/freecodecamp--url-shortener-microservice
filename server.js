@@ -40,7 +40,7 @@ app.post('/api/shorturl', (req, res) => {
       }
     );
   }
-  
+
   let parsed_url;
 
   try {
@@ -54,7 +54,7 @@ app.post('/api/shorturl', (req, res) => {
     );
   }
 
-  DNS.lookup(parsed_url.hostname, (err) => {
+  DNS.lookup(parsed_url.href, (err) => {
     if (err) {
       return res.json(
         {
