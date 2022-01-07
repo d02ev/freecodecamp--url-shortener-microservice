@@ -61,14 +61,19 @@ app.post('/api/shorturl', (req, res) => {
         // object creation for entry into url
         const url_object = {
           "original_url": _url,
-          "short_url": id
+          "short_url": `${id}`
         };
 
         // pushing each new entry into the array
         URL.push(url_object);
 
         // return the new entry created
-        return res.json(url_object);
+        return res.json(
+          {
+            "original_url": _url,
+            "short_url": id
+          }
+        );
       }
     }
   });
