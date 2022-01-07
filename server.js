@@ -95,7 +95,7 @@ app.get('/api/shorturl/:id', (req, res) => {
   const short_link = URL.find(sl => sl.short_url === _id);
 
   if (short_link) {
-    return res.redirect('https://' + short_link.original_url);
+    return res.redirect(short_link.original_url);
   }
   else {
     return res.json(
