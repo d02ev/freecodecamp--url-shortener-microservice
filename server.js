@@ -44,20 +44,32 @@ app.post('/api/shorturl', (req, res) => {
       );
     }
     else {
-      // increment for each new valid url
-      ++id;
+      const link_exists = URL.find(l => l.original_url === _url)
 
-      // object creation for entry into url
-      const url_object = {
-        original_url: _url,
-        short_url: `${id}`
-      };
+      if (link_exists) {
+        return res.json(
+          {
+            "original_url": _url,
+            "short_url": `${id}`
+          }
+        );
+      }
+      else {
+        // increment for each new valid url
+        ++id;
 
-      // pushing each new entry into the array
-      URL.push(url_object);
+        // object creation for entry into url
+        const url_object = {
+          "original_url": _url,
+          "short_url": `${id}`
+        };
 
-      // return the new entry created
-      return res.json(url_object); 
+        // pushing each new entry into the array
+        URL.push(url_object);
+
+        // return the new entry created
+        return res.json(url_object);
+      }
     }
   });
 });
