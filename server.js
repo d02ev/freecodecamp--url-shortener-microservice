@@ -19,12 +19,12 @@ app.use(cors());
 
 app.use('/public', express.static(`${process.cwd()}/public`));
 
-app.get('/', function(req, res) {
+app.get('/', function (req, res) {
   res.sendFile(process.cwd() + '/views/index.html');
 });
 
 // array of object to map links with an ID
-const URL = [];
+const URLs = [];
 
 // ID variable to be mapped with
 let id = 0;
@@ -33,7 +33,7 @@ let id = 0;
 app.post('/api/shorturl', (req, res) => {
   const { url: _url } = req.body;
 
-  if(_url === "") {
+  if (_url === "") {
     return res.json(
       {
         "error": "invalid url"
@@ -41,58 +41,60 @@ app.post('/api/shorturl', (req, res) => {
     );
   }
 
-  const modified_url = _url.replace(/^https?:\/\//, '');
+  let parsed_url;
 
-  DNS.lookup(modified_url, (err) => {
-    if (err) {
+  try {
+    parsed_url = new URL(_url);
+  }
+  catch (err) {
+    return res.json(
+      {
+        "error": "invalid url"
+      }
+    );
+  }
+
+  DNS.lookup(parsed_url.hostname, (err) => {
+    const link_exists = URLs.find(l => l.original_url === _url)
+
+    if (link_exists) {
       return res.json(
         {
-          "error": "invalid url"
+          "original_url": _url,
+          "short_url": id
         }
       );
     }
     else {
-      const link_exists = URL.find(l => l.original_url === _url)
+      // increment for each new valid url
+      ++id;
 
-      if (link_exists) {
-        return res.json(
-          {
-            "original_url": _url,
-            "short_url": id
-          }
-        );
-      }
-      else {
-        // increment for each new valid url
-        ++id;
+      // object creation for entry into url
+      const url_object = {
+        "original_url": _url,
+        "short_url": `${id}`
+      };
 
-        // object creation for entry into url
-        const url_object = {
+      // pushing each new entry into the array
+      URLs.push(url_object);
+
+      // return the new entry created
+      return res.json(
+        {
           "original_url": _url,
-          "short_url": `${id}`
-        };
-
-        // pushing each new entry into the array
-        URL.push(url_object);
-
-        // return the new entry created
-        return res.json(
-          {
-            "original_url": _url,
-            "short_url": id
-          }
-        );
-      }
+          "short_url": id
+        }
+      );
     }
   });
 });
 
 // get request to navigate to the url
 app.get('/api/shorturl/:id', (req, res) => {
-  const {id: _id} = req.params;
+  const { id: _id } = req.params;
 
   // finding if the id already exists
-  const short_link = URL.find(sl => sl.short_url === _id);
+  const short_link = URLs.find(sl => sl.short_url === _id);
 
   if (short_link) {
     return res.redirect(short_link.original_url);
@@ -106,7 +108,7 @@ app.get('/api/shorturl/:id', (req, res) => {
   }
 });
 
-app.listen(port, function() {
+app.listen(port, function () {
   console.log(`Listening on port ${port}`);
 });
 
