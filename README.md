@@ -42,6 +42,7 @@ User Stories
 - Working with requests created using HTML forms, which are POST requests.
 - Working with results generated from the POST methods.
 - Working with res.redirect().
+- Working with try...catch block.
 
 ### Continued Development
 
